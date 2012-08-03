@@ -32,6 +32,7 @@ describe "AuthenticationPages" do
 
     describe "with valid information" do
       let(:user) { FactoryGirl.create(:user) }
+
       before { sign_in user }
 
       it { should have_selector('title', text: user.name) }
@@ -44,6 +45,18 @@ describe "AuthenticationPages" do
       describe "followed by signout" do
         before { click_link "Sign out" }
         it { should have_link('Sign in') }
+        it { should_not have_link('Profile', href: user_path(user)) }
+        it { should_not have_link('Settings', href: edit_user_path(user)) }
+      end
+
+      describe "attempting to access new action" do
+        before { visit signup_path }
+        it { should have_selector("title", text: full_title(''))}
+      end
+
+      describe "attempting to access create action" do
+        before { post users_path }
+        specify { response.should redirect_to(root_path) }
       end
     end
   end
